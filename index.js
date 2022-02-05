@@ -21,8 +21,17 @@ async function run() {
 
         const database = client.db('waterloo');
         const packagesCollection = database.collection('packages')
-        const bookedTicket = database.collection('booking')
+        const bookedTicket = database.collection('booking');
+        const usersCollection = database.collection('user')
 
+
+        // add packages api
+        app.post('/packages', async (req, res) => {
+            const packages = req.body;
+            const result = await packagesCollection.insertOne(packages)
+            console.log(result);
+            res.json(result);
+        })
 
         // get api for packages
         app.get('/packages', async (req, res) => {
@@ -46,6 +55,63 @@ async function run() {
             res.send(result)
         })
 
+        //mybooking api
+        app.get('/mybooking/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { email: email }
+            const result = await bookedTicket.find(query).toArray();
+            res.json(result)
+
+        })
+        //all booking api
+        app.get('/booking', async (req, res) => {
+            const result = await bookedTicket.find({}).toArray();
+            res.json(result)
+
+        })
+
+        //cancel ticket api
+        app.delete('/mybooking/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await bookedTicket.deleteOne(query)
+            res.send(result)
+        })
+
+        // post api for users
+        app.post('/users', async (req, res) => {
+            const user = req.body
+            const result = await usersCollection.insertOne(user)
+            res.send(result)
+        })
+
+
+        // admin cheking api
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query)
+            let isAdmin = false
+            if (user?.role === 'admin') {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin })
+        })
+
+
+        //status update api for booking
+        app.put('/booking/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const updateDoc = {
+                $set: {
+                    status: "Approved"
+                },
+            };
+            const result = await bookedTicket.updateOne(filter, updateDoc)
+            res.send(result)
+            console.log(result);
+        })
     }
     finally {
 
