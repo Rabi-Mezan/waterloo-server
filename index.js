@@ -49,7 +49,7 @@ async function run() {
         })
 
         // book ticket api
-        app.post('/bookticket', async (req, res) => {
+        app.post('/bookTicket', async (req, res) => {
             const bookticket = req.body;
             const result = await bookedTicket.insertOne(bookticket);
             res.send(result)
