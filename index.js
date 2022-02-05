@@ -21,11 +21,28 @@ async function run() {
 
         const database = client.db('waterloo');
         const packagesCollection = database.collection('packages')
+        const bookedTicket = database.collection('booking')
 
 
         // get api for packages
         app.get('/packages', async (req, res) => {
             const result = await packagesCollection.find({}).toArray()
+            res.send(result)
+        })
+
+        //get single package details
+        app.get('/details/:id', async (req, res) => {
+            const id = req.params.id;
+            // console.log(id);
+            const query = { _id: ObjectId(id) }
+            const package = await packagesCollection.findOne(query);
+            res.send(package)
+        })
+
+        // book ticket api
+        app.post('/bookticket', async (req, res) => {
+            const bookticket = req.body;
+            const result = await bookedTicket.insertOne(bookticket);
             res.send(result)
         })
 
