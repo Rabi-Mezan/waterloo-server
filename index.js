@@ -23,6 +23,7 @@ async function run() {
         const packagesCollection = database.collection('packages')
         const bookedTicket = database.collection('booking');
         const usersCollection = database.collection('user')
+        const feedbackCollection = database.collection('feedback')
 
 
         // add packages api
@@ -31,6 +32,20 @@ async function run() {
             const result = await packagesCollection.insertOne(packages)
             console.log(result);
             res.json(result);
+        })
+
+        //post api for feedback
+        app.post('/feedback', async (req, res) => {
+            const feedback = req.body;
+            const result = await feedbackCollection.insertOne(feedback)
+            res.json(result)
+
+        })
+
+        //get api for feedback
+        app.get('/feedback', async (req, res) => {
+            const result = await feedbackCollection.find({}).toArray()
+            res.send(result)
         })
 
         // get api for packages
